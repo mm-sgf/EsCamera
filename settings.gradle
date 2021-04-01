@@ -1,0 +1,3 @@
+include ':escamera'
+include ':app'
+rootProject.name = "EsCamera"

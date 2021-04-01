@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/EsCamera.iml" filepath="$PROJECT_DIR$/.idea/modules/EsCamera.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EsCamera.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EsCamera.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/escamera/EsCamera.escamera.iml" filepath="$PROJECT_DIR$/.idea/modules/escamera/EsCamera.escamera.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">EsCamera</string>
+    <string name="no_permission_tips">没有获取权限成功，请获取权限后重新开启</string>
+</resources>
