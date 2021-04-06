@@ -7,8 +7,6 @@ import android.hardware.camera2.params.MeteringRectangle;
 import android.util.Pair;
 import android.view.Surface;
 
-import androidx.annotation.NonNull;
-
 import com.cfox.camera.camera.session.CameraSession;
 import com.cfox.camera.camera.info.CameraInfoManager;
 import com.cfox.camera.camera.info.CameraInfoManagerImpl;
@@ -27,9 +25,7 @@ import com.cfox.camera.EsParams;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.functions.Predicate;
 
 public class PhotoSessionManagerImpl extends AbsSessionManager implements PhotoSessionManager {
 
@@ -73,34 +69,28 @@ public class PhotoSessionManagerImpl extends AbsSessionManager implements PhotoS
         mPhotoSession = null;
         mCaptureBuilder = null;
         mSessionRequestManager.resetApply();
-        mCameraSessionManager.closeSession().subscribe(new CameraObserver<EsParams>());
+        mCameraSessionManager.closeSession().subscribe(new CameraObserver<>());
 
     }
 
     @Override
     public Observable<EsParams> onPreviewRepeatingRequest(final EsParams esParams) {
-        return Observable.create(new ObservableOnSubscribe<EsParams>() {
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<EsParams> emitter) {
-                mFocusHelper.init(esParams.get(EsParams.Key.PREVIEW_SIZE));
-                mPreviewCaptureCallback.applyPreview(mPhotoSession, getPreviewBuilder(), emitter);
-                mSessionRequestManager.applyPreviewRequest(getPreviewBuilder());
-                applyPreviewRequest(getPreviewBuilder(), esParams);
-                esParams.put(EsParams.Key.REQUEST_BUILDER, getPreviewBuilder());
-                esParams.put(EsParams.Key.CAPTURE_CALLBACK, mPreviewCaptureCallback);
-                mPhotoSession.onRepeatingRequest(esParams).subscribe(new CameraObserver<EsParams>());
+        return Observable.create((ObservableOnSubscribe<EsParams>) emitter -> {
+            mFocusHelper.init(esParams.get(EsParams.Key.PREVIEW_SIZE));
+            mPreviewCaptureCallback.applyPreview(mPhotoSession, getPreviewBuilder(), emitter);
+            mSessionRequestManager.applyPreviewRequest(getPreviewBuilder());
+            applyPreviewRequest(getPreviewBuilder(), esParams);
+            esParams.put(EsParams.Key.REQUEST_BUILDER, getPreviewBuilder());
+            esParams.put(EsParams.Key.CAPTURE_CALLBACK, mPreviewCaptureCallback);
+            mPhotoSession.onRepeatingRequest(esParams).subscribe(new CameraObserver<>());
+        }).filter(esParams1 -> {
+            // 如果 preview 发来的信息是开始捕获， 会被拦截并进行capture
+            Integer captureState = esParams1.get(EsParams.Key.CAPTURE_STATE);
+            if (captureState != null && captureState == EsParams.Value.CAPTURE_STATE.CAPTURE_START) {
+                mPhotoCaptureCallback.capture();
+                return false;
             }
-        }).filter(new Predicate<EsParams>() {
-            @Override
-            public boolean test(@NonNull EsParams esParams) {
-                // 如果 preview 发来的信息是开始捕获， 会被拦截并进行capture
-                Integer captureState = esParams.get(EsParams.Key.CAPTURE_STATE);
-                if (captureState != null && captureState == EsParams.Value.CAPTURE_STATE.CAPTURE_START) {
-                    mPhotoCaptureCallback.capture();
-                    return false;
-                }
-                return true;
-            }
+            return true;
         });
     }
 
@@ -124,18 +114,15 @@ public class PhotoSessionManagerImpl extends AbsSessionManager implements PhotoS
     @Override
     public Observable<EsParams> onRepeatingRequest(final EsParams esParams) {
 
-        return Observable.create(new ObservableOnSubscribe<EsParams>() {
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<EsParams> emitter) {
-                EsLog.d("onSendRepeatingRequest: req:" + esParams);
-                esParams.put(EsParams.Key.REQUEST_BUILDER, getPreviewBuilder());
-                esParams.put(EsParams.Key.CAPTURE_CALLBACK, mPreviewCaptureCallback);
-                flashRepeatingRequest(getPreviewBuilder(), esParams);
-                zoomRepeatingRequest(getPreviewBuilder(),esParams);
-                evRepeatingRequest(getPreviewBuilder(), esParams);
-                afTriggerRepeatingRequest(getPreviewBuilder(), esParams);
-                resetFocusRepeatingRequest(getPreviewBuilder(), esParams);
-            }
+        return Observable.create(emitter -> {
+            EsLog.d("onSendRepeatingRequest: req:" + esParams);
+            esParams.put(EsParams.Key.REQUEST_BUILDER, getPreviewBuilder());
+            esParams.put(EsParams.Key.CAPTURE_CALLBACK, mPreviewCaptureCallback);
+            flashRepeatingRequest(getPreviewBuilder(), esParams);
+            zoomRepeatingRequest(getPreviewBuilder(),esParams);
+            evRepeatingRequest(getPreviewBuilder(), esParams);
+            afTriggerRepeatingRequest(getPreviewBuilder(), esParams);
+            resetFocusRepeatingRequest(getPreviewBuilder(), esParams);
         });
     }
 
@@ -204,30 +191,24 @@ public class PhotoSessionManagerImpl extends AbsSessionManager implements PhotoS
 
     @Override
     public Observable<EsParams> capture(final EsParams esParams) {
-        return Observable.create(new ObservableOnSubscribe<EsParams>() {
-            @Override
-            public void subscribe(@NonNull final ObservableEmitter<EsParams> emitter) {
-                CaptureRequest.Builder builder = getCaptureBuilder();
-                builder.set(CaptureRequest.JPEG_ORIENTATION, esParams.get(EsParams.Key.PIC_ORIENTATION, 0));
-                mSessionRequestManager.applyAllRequest(builder);
-                mPhotoCaptureCallback.prepareCapture(mPhotoSession, builder, emitter);
-                if (mCameraInfoManager.canTriggerAf()) {
-                    mPreviewCaptureCallback.capture();
-                } else {
-                    mPhotoCaptureCallback.capture();
-                }
+        return Observable.create((ObservableOnSubscribe<EsParams>) emitter -> {
+            CaptureRequest.Builder builder = getCaptureBuilder();
+            builder.set(CaptureRequest.JPEG_ORIENTATION, esParams.get(EsParams.Key.PIC_ORIENTATION, 0));
+            mSessionRequestManager.applyAllRequest(builder);
+            mPhotoCaptureCallback.prepareCapture(mPhotoSession, builder, emitter);
+            if (mCameraInfoManager.canTriggerAf()) {
+                mPreviewCaptureCallback.capture();
+            } else {
+                mPhotoCaptureCallback.capture();
             }
-        }).filter(new Predicate<EsParams>() {
-            @Override
-            public boolean test(@NonNull EsParams esParams) {
-                Integer captureState = esParams.get(EsParams.Key.CAPTURE_STATE);
-                if (captureState != null
-                        && (captureState == EsParams.Value.CAPTURE_STATE.CAPTURE_FAIL
-                        || captureState == EsParams.Value.CAPTURE_STATE.CAPTURE_COMPLETED)) {
-                    mPreviewCaptureCallback.resetPreviewState();
-                }
-                return true;
+        }).filter(esParams1 -> {
+            Integer captureState = esParams1.get(EsParams.Key.CAPTURE_STATE);
+            if (captureState != null
+                    && (captureState == EsParams.Value.CAPTURE_STATE.CAPTURE_FAIL
+                    || captureState == EsParams.Value.CAPTURE_STATE.CAPTURE_COMPLETED)) {
+                mPreviewCaptureCallback.resetPreviewState();
             }
+            return true;
         });
     }
 }

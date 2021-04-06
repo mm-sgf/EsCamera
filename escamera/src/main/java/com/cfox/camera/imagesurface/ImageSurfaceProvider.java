@@ -1,4 +1,4 @@
-package com.cfox.camera.imagereader;
+package com.cfox.camera.imagesurface;
 
 import android.os.Handler;
 import android.util.Size;

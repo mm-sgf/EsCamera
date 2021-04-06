@@ -15,25 +15,32 @@ import java.util.List;
  */
 public class SurfaceManager {
 
-    private final SurfaceProvider mSurfaceProvider;
+    private static final SurfaceManager sSurfaceManager = new SurfaceManager();
+
+    private SurfaceProvider mSurfaceProvider;
     private final List<Surface> mCaptureSurface;
     private final List<Surface> mPreviewSurface;
 
-    /**
-     * 这个 surfaceProvider 是提供预览的 surfaceProvider
-     * @param surfaceProvider
-     */
-    public SurfaceManager(SurfaceProvider surfaceProvider) {
-        this.mSurfaceProvider = surfaceProvider;
+    private SurfaceManager() {
         this.mCaptureSurface = new ArrayList<>();
         this.mPreviewSurface = new ArrayList<>();
     }
 
+    public static SurfaceManager getInstance() {
+        return sSurfaceManager;
+    }
+
+    public void setSurfaceProvider(SurfaceProvider surfaceProvider) {
+        release();
+        EsLog.e(" set ===surface ===>");
+        this.mSurfaceProvider = surfaceProvider;
+    }
+
     /**
      * 只获取预览surface list
-     * @return
      */
     public List<Surface> getPreviewSurface() {
+        EsLog.e("get preview " + mSurfaceProvider.getSurface());
         mPreviewSurface.add(mSurfaceProvider.getSurface());
         return mPreviewSurface;
     }
@@ -45,7 +52,6 @@ public class SurfaceManager {
 
     /**
      * 获取所有surface list , 包括预览 surface 和 capture surface
-     * @return
      */
     public List<Surface> getTotalSurface() {
         List<Surface> surfaceList = new ArrayList<>(mCaptureSurface);
@@ -74,6 +80,13 @@ public class SurfaceManager {
 
     public boolean isAvailable() {
         return mSurfaceProvider.isAvailable();
+    }
+
+    public void release() {
+        EsLog.d("release===>");
+        mSurfaceProvider = null;
+        mCaptureSurface.clear();
+        mPreviewSurface.clear();
     }
 
 }

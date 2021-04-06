@@ -2,7 +2,7 @@ package com.cfox.camera.request;
 
 import android.util.Size;
 
-import com.cfox.camera.imagereader.ImageReaderProvider;
+import com.cfox.camera.imagesurface.ImageReaderProvider;
 import com.cfox.camera.surface.SurfaceProvider;
 import com.cfox.camera.EsParams;
 
@@ -17,7 +17,7 @@ public class PreviewRequest {
     private final Size mPictureSize;
     private final int mImageFormat;
     private final int mFlashState;
-    public PreviewRequest(Builder builder) {
+    private PreviewRequest(Builder builder) {
         mImageReaderProviders.addAll(builder.mImageReaderProviders);
         mSurfaceProvider = builder.mSurfaceProvider;
         mCameraId = builder.mCameraId;

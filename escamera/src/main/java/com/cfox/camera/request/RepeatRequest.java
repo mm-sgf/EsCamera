@@ -10,7 +10,7 @@ public class RepeatRequest {
     private final Pair<Float, Float> mAfTouchXY;
     private final boolean mIsResetFocus;
 
-    public RepeatRequest(Builder builder) {
+    private RepeatRequest(Builder builder) {
         mEv = builder.mEv;
         mZoomSize = builder.mZoomSize;
         mFlashState = builder.mFlashState;

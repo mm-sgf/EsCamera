@@ -30,18 +30,22 @@ public class PhotoCaptureImpl implements PhotoCapture {
     private final PhotoMode mPhotoMode;
     private final CameraInfoManager mCameraInfoManager;
     private final Business mBusiness;
+    private final SurfaceManager mSurfaceManager;
+    private PreviewStateListener mPreviewListener;
 
     public PhotoCaptureImpl(PhotoMode photoMode, ConfigWrapper configWrapper) {
         mPhotoMode = photoMode;
         mBusiness = new PhotoBusinessImpl(configWrapper);
         mCameraInfoManager = CameraInfoManagerImpl.CAMERA_INFO_MANAGER;
+        mSurfaceManager = SurfaceManager.getInstance();
     }
 
     @Override
     public final void onStartPreview(@NonNull PreviewRequest request, final PreviewStateListener listener) {
-        SurfaceManager surfaceManager = new SurfaceManager(request.getSurfaceProvider());
+        mPreviewListener = listener;
         final EsParams esParams = new EsParams();
-        esParams.put(EsParams.Key.SURFACE_MANAGER, surfaceManager);
+        mSurfaceManager.setSurfaceProvider(request.getSurfaceProvider());
+        esParams.put(EsParams.Key.SURFACE_MANAGER, mSurfaceManager);
         esParams.put(EsParams.Key.CAMERA_ID, request.getCameraId());
         esParams.put(EsParams.Key.FLASH_STATE, request.getFlashState());
         esParams.put(EsParams.Key.IMAGE_READER_PROVIDERS, request.getImageReaderProviders());
@@ -52,9 +56,9 @@ public class PhotoCaptureImpl implements PhotoCapture {
 
         // 设置预览大小
         Size previewSizeForReq = request.getPreviewSize();
-        Size previewSize = mBusiness.getPreviewSize(previewSizeForReq, mCameraInfoManager.getPreviewSize(surfaceManager.getPreviewSurfaceClass()));
+        Size previewSize = mBusiness.getPreviewSize(previewSizeForReq, mCameraInfoManager.getPreviewSize(mSurfaceManager.getPreviewSurfaceClass()));
         esParams.put(EsParams.Key.PREVIEW_SIZE, previewSize);
-        surfaceManager.setAspectRatio(previewSize);
+        mSurfaceManager.setAspectRatio(previewSize);
 
         // 设置图片大小
         Size pictureSizeForReq = request.getPictureSize();
@@ -69,8 +73,12 @@ public class PhotoCaptureImpl implements PhotoCapture {
             public void onNext(@NonNull EsParams resultParams) {
                 EsLog.d("onNext: .requestPreview...." + resultParams);
                 Integer afState = resultParams.get(EsParams.Key.AF_STATE);
-                if (afState != null && listener != null) {
-                    listener.onFocusStateChange(afState);
+                if (afState != null && mPreviewListener != null) {
+                    mPreviewListener.onFocusStateChange(afState);
+                }
+
+                if (EsParams.Value.OK.equals(resultParams.get(EsParams.Key.PREVIEW_FIRST_FRAME)) && mPreviewListener != null) {
+                    mPreviewListener.onFirstFrameCallback();
                 }
             }
         });
@@ -103,13 +111,16 @@ public class PhotoCaptureImpl implements PhotoCapture {
 
         EsLog.d("CameraRepeating==>" + esParams);
 
-        mPhotoMode.requestCameraRepeating(esParams).subscribe(new CameraObserver<EsParams>());
+        mPhotoMode.requestCameraRepeating(esParams).subscribe(new CameraObserver<>());
     }
 
     @Override
     public final void onStop() {
         EsParams esParams = new EsParams();
-        mPhotoMode.requestStop(esParams).subscribe(new CameraObserver<EsParams>());
+        mPhotoMode.requestStop(esParams).doOnNext(esParams1 -> {
+            mSurfaceManager.release();
+            mPreviewListener = null;
+        }).subscribe(new CameraObserver<>());
     }
 
     @Override

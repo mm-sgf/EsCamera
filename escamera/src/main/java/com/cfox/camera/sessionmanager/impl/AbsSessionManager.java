@@ -14,10 +14,7 @@ import com.cfox.camera.EsParams;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 
 abstract class AbsSessionManager implements SessionManager {
@@ -53,23 +50,17 @@ abstract class AbsSessionManager implements SessionManager {
     public Observable<EsParams> onOpenCamera(final EsParams esParams) {
         mSurfaceManager = esParams.get(EsParams.Key.SURFACE_MANAGER);
         mPreviewBuilder = null;// SurfaceManager 被更新，preview builder 需要更新
-        return beforeOpenCamera(esParams).flatMap(new Function<EsParams, ObservableSource<EsParams>>() {
-            @Override
-            public ObservableSource<EsParams> apply(@NonNull EsParams esParams) {
-                EsLog.d("session open camera ===>" + esParams);
-                mCameraSession = getCameraSession(esParams);
-                return mCameraSession.onOpenCamera(esParams);
-            }
+        return beforeOpenCamera(esParams).flatMap((Function<EsParams, ObservableSource<EsParams>>) esParams1 -> {
+            EsLog.d("session open camera ===>" + esParams1);
+            mCameraSession = getCameraSession(esParams1);
+            return mCameraSession.onOpenCamera(esParams1);
         });
     }
 
     private Observable<EsParams> beforeOpenCamera(final EsParams esParams) {
-        return Observable.create(new ObservableOnSubscribe<EsParams>() {
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<EsParams> emitter) {
-                onBeforeOpenCamera(esParams);
-                emitter.onNext(esParams);
-            }
+        return Observable.create(emitter -> {
+            onBeforeOpenCamera(esParams);
+            emitter.onNext(esParams);
         });
     }
 

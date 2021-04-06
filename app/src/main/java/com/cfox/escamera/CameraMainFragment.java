@@ -1,6 +1,7 @@
 package com.cfox.escamera;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.hardware.camera2.CaptureResult;
 import android.os.Build;
@@ -73,7 +74,6 @@ public class CameraMainFragment extends Fragment implements PreviewStateListener
         super.onCreate(savedInstanceState);
         mCameraController = new EsyCameraController(getActivity());
         OrientationSensorManager manager =  OrientationSensorManager.getInstance();
-        manager.init(getActivity());
         mOrientationFilter = new OrientationFilter(manager);
     }
 
@@ -83,6 +83,7 @@ public class CameraMainFragment extends Fragment implements PreviewStateListener
         return inflater.inflate(R.layout.fragment_camera_main, container, false);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -94,74 +95,43 @@ public class CameraMainFragment extends Fragment implements PreviewStateListener
         mPreviewView = view.findViewById(R.id.preview_view);
 
 
-        view.findViewById(R.id.btn_torch_flash).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCameraController.torchFlash();
-            }
-        });
+        view.findViewById(R.id.btn_torch_flash).setOnClickListener(v ->
+                mCameraController.torchFlash());
 
-        view.findViewById(R.id.btn_on_flash).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCameraController.onFlash();
-            }
-        });
+        view.findViewById(R.id.btn_on_flash).setOnClickListener(v ->
+                mCameraController.onFlash());
 
-        view.findViewById(R.id.btn_auto_flash).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCameraController.autoFlash();
-            }
-        });
+        view.findViewById(R.id.btn_auto_flash).setOnClickListener(v ->
+                mCameraController.autoFlash());
 
 
-        view.findViewById(R.id.btn_close_flash).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCameraController.closeFlash();
-            }
+        view.findViewById(R.id.btn_close_flash).setOnClickListener(v ->
+                mCameraController.closeFlash());
+
+        view.findViewById(R.id.btn_open_back).setOnClickListener(v -> {
+            mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
+            mCameraController.backCamera(mSurfaceHelperImpl, CameraMainFragment.this);
         });
 
-        view.findViewById(R.id.btn_open_back).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
-                mCameraController.backCamera(mSurfaceHelperImpl, CameraMainFragment.this);
-            }
-        });
-        view.findViewById(R.id.btn_open_font).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
-                mCameraController.fontCamera(mSurfaceHelperImpl, CameraMainFragment.this);
-            }
+        view.findViewById(R.id.btn_open_font).setOnClickListener(v -> {
+            mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
+            mCameraController.fontCamera(mSurfaceHelperImpl, CameraMainFragment.this);
         });
 
-        view.findViewById(R.id.btn_photo).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCameraController.photoModule();
-                mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
-                mCameraController.backCamera(mSurfaceHelperImpl, CameraMainFragment.this);
-            }
+        view.findViewById(R.id.btn_photo).setOnClickListener(v -> {
+            mCameraController.photoModule();
+            mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
+            mCameraController.backCamera(mSurfaceHelperImpl, CameraMainFragment.this);
         });
 
-        view.findViewById(R.id.btn_video).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCameraController.videoModule();
-                mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
-                mCameraController.backCamera(mSurfaceHelperImpl, CameraMainFragment.this);
-            }
+        view.findViewById(R.id.btn_video).setOnClickListener(v -> {
+            mCameraController.videoModule();
+            mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
+            mCameraController.backCamera(mSurfaceHelperImpl, CameraMainFragment.this);
         });
 
-        view.findViewById(R.id.btn_capture).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCameraController.capture();
-            }
-        });
+        view.findViewById(R.id.btn_capture).setOnClickListener(v ->
+                mCameraController.capture());
 
         ((SeekBar)view.findViewById(R.id.seek_ev)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -199,22 +169,14 @@ public class CameraMainFragment extends Fragment implements PreviewStateListener
             }
         });
 
-        mPreviewView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    mOrientationFilter.setOnceListener(new OrientationFilter.OrientationChangeListener() {
-                        @Override
-                        public void onChanged() {
-                            mCameraController.resetFocus();
-                        }
-                    });
-                    mCameraController.setFocus(event.getX(), event.getY());
-                    mFocusView.moveToPosition(event.getX(), event.getY());
+        mPreviewView.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                mOrientationFilter.setOnceListener(() -> mCameraController.resetFocus());
+                mCameraController.setFocus(event.getX(), event.getY());
+                mFocusView.moveToPosition(event.getX(), event.getY());
 
-                }
-                return true;
             }
+            return true;
         });
 
     }
@@ -222,7 +184,7 @@ public class CameraMainFragment extends Fragment implements PreviewStateListener
     private void openCamera() {
         mOrientationFilter.onResume();
         mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
-        EsLog.d("onResume: .......");
+        EsLog.d("openCamera: .......");
         mCameraController.backCamera(mSurfaceHelperImpl, this);
     }
 
@@ -251,49 +213,45 @@ public class CameraMainFragment extends Fragment implements PreviewStateListener
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mOrientationFilter.release();
+    }
+
     private void showMsg(String msg) {
         Toast.makeText(getContext(), "" + msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onFirstFrameCallback() {
+        // 必须要等第一帧数据回来，才可以对camera 进行操作
+        EsLog.d("onFirstFrameCallback");
     }
 
     @Override
     public void onFocusStateChange(int state) {
         switch (state) {
             case CaptureResult.CONTROL_AF_STATE_ACTIVE_SCAN:
-                mFocusView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mFocusView.startFocus();
-                    }
-                });
+                mFocusView.post(() ->
+                        mFocusView.startFocus());
                 break;
             case CaptureResult.CONTROL_AF_STATE_PASSIVE_FOCUSED:
             case CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED:
-                mFocusView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mFocusView.focusSuccess();
-                    }
-                });
+                mFocusView.post(() ->
+                        mFocusView.focusSuccess());
                 break;
             case CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED:
             case CaptureResult.CONTROL_AF_STATE_PASSIVE_UNFOCUSED:
-                mFocusView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mFocusView.focusFailed();
-                    }
-                });
+                mFocusView.post(() ->
+                        mFocusView.focusFailed());
                 break;
             case CaptureResult.CONTROL_AF_STATE_PASSIVE_SCAN:
 //                listener.autoFocus();
                 break;
             case CaptureResult.CONTROL_AF_STATE_INACTIVE:
-                mFocusView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mFocusView.hideFocusView();
-                    }
-                });
+                mFocusView.post(() ->
+                        mFocusView.hideFocusView());
                 break;
         }
     }

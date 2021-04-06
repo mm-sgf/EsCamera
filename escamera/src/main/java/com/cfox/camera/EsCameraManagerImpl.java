@@ -28,6 +28,6 @@ public class EsCameraManagerImpl implements EsCameraManager {
     @Override
     public Capture videoModule() {
         VideoMode videoMode = mCameraModule.initModule(CameraModeManager.ModuleFlag.MODULE_VIDEO);
-        return new VideoCaptureImpl(videoMode);
+        return new VideoCaptureImpl(videoMode, mConfigWrapper);
     }
 }

@@ -6,7 +6,7 @@ import android.media.ImageReader;
 import android.os.Environment;
 import android.util.Size;
 
-import com.cfox.camera.imagereader.ImageReaderProvider;
+import com.cfox.camera.imagesurface.ImageReaderProvider;
 import com.cfox.camera.log.EsLog;
 
 import java.io.File;

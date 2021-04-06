@@ -6,12 +6,14 @@ import android.hardware.camera2.CaptureRequest;
 import android.util.Pair;
 import android.util.Size;
 
-import com.cfox.camera.imagereader.ImageReaderProvider;
+import com.cfox.camera.imagesurface.ImageReaderProvider;
 import com.cfox.camera.surface.SurfaceManager;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.reactivex.annotations.NonNull;
 
 public class EsParams {
 
@@ -36,9 +38,10 @@ public class EsParams {
         return def;
     }
 
+    @NonNull
     @Override
     public String toString() {
-        String result = super.toString();
+        String result;
         if (BuildConfig.DEBUG) {
             StringBuilder buffer = new StringBuilder("\n");
             buffer.append("================ Params ======================================================= ");
@@ -48,6 +51,8 @@ public class EsParams {
             }
             buffer.deleteCharAt(buffer.length() -1);
             result = buffer.toString();
+        } else {
+            result = super.toString();
         }
         return result;
     }

@@ -4,8 +4,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 
-import com.cfox.camera.log.EsLog;
-
 public class OrientationFilter implements SensorEventListener {
 
     private final OrientationSensorManager mSensorManager;
@@ -52,19 +50,21 @@ public class OrientationFilter implements SensorEventListener {
         if (mChangeListener != null && mSensorX != null && mSensorY != null) {
             float sensorY = Math.abs(Math.round((event.values[0] - mSensorY) * 100));
             float sensorX = Math.abs(Math.round((event.values[1] - mSensorX) * 100));
-            EsLog.d("sensorY==>" + sensorY  + "  sensorX:" + sensorX);
             if (sensorX > 20 * 100 || sensorY > 20 * 100) {
                 mChangeListener.onChanged();
                 mChangeListener = null;
                 mSensorX = null;
                 mSensorY = null;
             }
-
         }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    public void release() {
+        mChangeListener = null;
     }
 }

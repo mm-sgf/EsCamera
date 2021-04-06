@@ -9,7 +9,6 @@ import com.cfox.camera.utils.WorkerHandlerManager;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 
 public abstract class BaseMode implements IMode {
@@ -26,26 +25,17 @@ public abstract class BaseMode implements IMode {
     }
 
     public Observable<EsParams> requestPreview(EsParams esParams) {
-        return applySurface(esParams).flatMap(new Function<EsParams, ObservableSource<EsParams>>() {
-            @Override
-            public ObservableSource<EsParams> apply(@NonNull EsParams esParams) {
-                EsLog.d("open camera request ===>params:" + esParams);
-                // open camera request
-                return mSessionManager.onOpenCamera(esParams);
-            }
-        }).flatMap(new Function<EsParams, ObservableSource<EsParams>>() {
-            @Override
-            public ObservableSource<EsParams> apply(@NonNull EsParams esParams) throws Exception {
-                EsLog.d("create session before ....." + esParams);
-                // 创建 camera session
-                return mSessionManager.onCreatePreviewSession(esParams);
-            }
-        }).flatMap(new Function<EsParams, ObservableSource<EsParams>>() {
-            @Override
-            public ObservableSource<EsParams> apply(@NonNull EsParams esParams) throws Exception {
-                EsLog.d("onSendRepeatingRequest ......" + esParams);
-                return mSessionManager.onPreviewRepeatingRequest(esParams);
-            }
+        return applySurface(esParams).flatMap((Function<EsParams, ObservableSource<EsParams>>) applyResultParams -> {
+            EsLog.d("open camera request ===>params:" + applyResultParams);
+            // open camera request
+            return mSessionManager.onOpenCamera(applyResultParams);
+        }).flatMap((Function<EsParams, ObservableSource<EsParams>>) openResultParams -> {
+            EsLog.d("create session before ....." + openResultParams);
+            // 创建 camera session
+            return mSessionManager.onCreatePreviewSession(openResultParams);
+        }).flatMap((Function<EsParams, ObservableSource<EsParams>>) sessionResultParams -> {
+            EsLog.d("onSendRepeatingRequest ......" + sessionResultParams);
+            return mSessionManager.onPreviewRepeatingRequest(sessionResultParams);
         }).subscribeOn(WorkerHandlerManager.getScheduler(WorkerHandlerManager.Tag.T_TYPE_CAMERA));
     }
 

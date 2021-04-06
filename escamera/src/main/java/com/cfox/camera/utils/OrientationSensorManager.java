@@ -8,14 +8,14 @@ import android.hardware.SensorManager;
 
 public class OrientationSensorManager implements SensorEventListener {
 
-    private static OrientationSensorManager sManager = new OrientationSensorManager();
+    private static final OrientationSensorManager sManager = new OrientationSensorManager();
     private SensorEventListener mListener;
     private SensorManager mSensorManager;
 
     private OrientationSensorManager(){}
 
     public void init(Context context) {
-        mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        mSensorManager = (SensorManager) context.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
     }
 
     public static OrientationSensorManager getInstance() {

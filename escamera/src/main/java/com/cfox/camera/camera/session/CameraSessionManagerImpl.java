@@ -13,9 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.annotations.NonNull;
 
 public class CameraSessionManagerImpl implements CameraSessionManager {
 
@@ -49,12 +46,9 @@ public class CameraSessionManagerImpl implements CameraSessionManager {
         }
 
         if (closeSessionList.size() == 0) {
-            return Observable.create(new ObservableOnSubscribe<EsParams>() {
-                @Override
-                public void subscribe(@NonNull ObservableEmitter<EsParams> emitter) throws Exception {
-                    EsLog.d("closeSessionIfNeed: closeSessionList.size() == 0 ");
-                    emitter.onNext(new EsParams());
-                }
+            return Observable.create(emitter -> {
+                EsLog.d("closeSessionIfNeed: closeSessionList.size() == 0 ");
+                emitter.onNext(new EsParams());
             });
         }
         EsLog.d("closeSessionIfNeed: close single session size:" + closeSessionList.size());
@@ -74,7 +68,7 @@ public class CameraSessionManagerImpl implements CameraSessionManager {
         if (mCameraSessionMap.containsKey(sessionId)) {
             EsLog.e("session already has: session id ：" + sessionId);
             session = mCameraSessionMap.get(sessionId);
-            session.onClose().subscribe(new CameraObserver<EsParams>());
+            session.onClose().subscribe(new CameraObserver<>());
         }  else  {
             session = new CameraSessionImpl(EsCameraDeviceImpl.getsInstance(mContext));
         }

@@ -6,7 +6,7 @@ public class EsException extends Exception {
 
     public EsException(String errorMsg) {
         super(errorMsg);
-        this.errorCode = 0;//EVENT_VALUE_UNDEFINED;
+        this.errorCode = 0;
         this.esParams = null;
     }
 
@@ -18,7 +18,7 @@ public class EsException extends Exception {
 
     public EsException(String errorMsg, Throwable throwable) {
         super(errorMsg, throwable);
-        this.errorCode = 0;//EVENT_VALUE_UNDEFINED;
+        this.errorCode = 0;
         this.esParams = null;
     }
 

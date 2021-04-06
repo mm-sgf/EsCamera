@@ -192,7 +192,7 @@ public class PreviewCaptureCallback extends CameraCaptureSession.CaptureCallback
         esParams.put(EsParams.Key.REQUEST_BUILDER, mPreviewBuilder);
         esParams.put(EsParams.Key.CAPTURE_CALLBACK, this);
         try {
-            mCameraSession.onRepeatingRequest(esParams).subscribe(new CameraObserver<EsParams>());
+            mCameraSession.onRepeatingRequest(esParams).subscribe(new CameraObserver<>());
             mCameraSession.capture(esParams);
         } catch (CameraAccessException e) {
             e.printStackTrace();

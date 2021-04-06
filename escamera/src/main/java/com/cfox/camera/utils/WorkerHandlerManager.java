@@ -13,9 +13,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class WorkerHandlerManager {
     public enum Tag {
-        T_TYPE_MAIN("main-thread"),
         T_TYPE_OTHER("other-thread"),
-        T_TYPE_IMAGE_READER("image-reader-thread"),
+        T_TYPE_IMAGE_SURFACE("image-surface-thread"),
         T_TYPE_CAMERA("camera-thread");
         protected final String tag;
         Tag(String tag) {

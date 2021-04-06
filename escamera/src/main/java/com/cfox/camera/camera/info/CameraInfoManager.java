@@ -10,8 +10,6 @@ public interface CameraInfoManager {
 
     void initCameraInfo(CameraInfo cameraInfo);
 
-//    int createPreviewTemplate();
-
     boolean isAutoFocusSupported();
 
     boolean isRawSupported();
@@ -34,7 +32,7 @@ public interface CameraInfoManager {
 
     Size[] getPictureSize(int format);
 
-    Size[] getPreviewSize(Class klass);
+    Size[] getPreviewSize(Class cls);
 
     Range<Integer> getEvRange();
 

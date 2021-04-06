@@ -1,9 +1,9 @@
 package com.cfox.camera.mode.impl;
 
 import com.cfox.camera.EsException;
-import com.cfox.camera.imagereader.ImageReaderManager;
-import com.cfox.camera.imagereader.ImageReaderManagerImpl;
-import com.cfox.camera.imagereader.ImageReaderProvider;
+import com.cfox.camera.imagesurface.ImageReaderManager;
+import com.cfox.camera.imagesurface.ImageSurfaceManagerImpl;
+import com.cfox.camera.imagesurface.ImageReaderProvider;
 import com.cfox.camera.sessionmanager.PhotoSessionManager;
 import com.cfox.camera.log.EsLog;
 import com.cfox.camera.mode.PhotoMode;
@@ -25,7 +25,7 @@ public class PhotoModeImpl extends BaseMode implements PhotoMode {
     public PhotoModeImpl(PhotoSessionManager photoSessionManager) {
         super(photoSessionManager);
         mPhotoSessionManager = photoSessionManager;
-        mImageReaderManager = new ImageReaderManagerImpl();
+        mImageReaderManager = new ImageSurfaceManagerImpl();
     }
 
     @Override
