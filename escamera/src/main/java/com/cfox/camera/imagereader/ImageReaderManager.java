@@ -1,13 +1,13 @@
 package com.cfox.camera.imagereader;
 
-import android.media.ImageReader;
+import android.view.Surface;
 
 import com.cfox.camera.EsParams;
 
 
 public interface ImageReaderManager {
 
-    ImageReader createImageReader(EsParams esParams, ImageReaderProvider provider);
+    Surface createImageSurface(EsParams esParams, ImageSurfaceProvider provider);
 
     void closeImageReaders();
 }

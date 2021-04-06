@@ -1,36 +1,39 @@
 package com.cfox.camera.imagereader;
 
-import android.graphics.ImageFormat;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Handler;
 import android.util.Size;
+import android.view.Surface;
 
 import java.nio.ByteBuffer;
 
 
-public abstract class ImageReaderProvider implements ImageReader.OnImageAvailableListener {
+public abstract class ImageReaderProvider extends ImageSurfaceProvider implements ImageReader.OnImageAvailableListener {
 
-    private final TYPE mType;
-
-    public enum TYPE {
-        CAPTURE,
-        PREVIEW
-    }
+    private ImageReader mImageReader;
 
     public ImageReaderProvider(TYPE type) {
-        this.mType = type;
+        super(type);
     }
 
-    public TYPE getType() {
-        return mType;
+    @Override
+    public Surface createImageSurface(Size previewSize, Size captureSize, Handler handler) {
+        mImageReader = createImageReader(previewSize, captureSize);
+        mImageReader.setOnImageAvailableListener(this, handler);
+        return mImageReader.getSurface();
     }
 
-    public ImageReader onCreateImageReader(Size previewSize, Size captureSize, Handler handler) {
-        ImageReader imageReader = createImageReader(previewSize, captureSize);
-        imageReader.setOnImageAvailableListener(this, handler);
-        return imageReader;
+    @Override
+    public void release() {
+        if (mImageReader != null) {
+            mImageReader.close();
+        }
     }
+
+    public abstract ImageReader createImageReader(Size previewSize, Size captureSize);
+
+    public abstract void onImageAvailable(ImageReader reader);
 
     public byte[] getByteFromReader(ImageReader reader) {
         Image image = reader.acquireLatestImage();
@@ -50,9 +53,4 @@ public abstract class ImageReaderProvider implements ImageReader.OnImageAvailabl
         }
         return totalBuffer.array();
     }
-
-
-    public abstract ImageReader createImageReader(Size previewSize, Size captureSize);
-
-    public abstract void onImageAvailable(ImageReader reader);
 }

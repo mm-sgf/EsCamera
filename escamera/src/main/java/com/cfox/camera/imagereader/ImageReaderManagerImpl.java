@@ -3,6 +3,7 @@ package com.cfox.camera.imagereader;
 import android.media.ImageReader;
 import android.os.Handler;
 import android.util.Size;
+import android.view.Surface;
 
 import com.cfox.camera.EsParams;
 import com.cfox.camera.utils.WorkerHandlerManager;
@@ -12,28 +13,27 @@ import java.util.List;
 
 public class ImageReaderManagerImpl implements ImageReaderManager {
 
-    private final List<ImageReader> mImageReaders;
+    private final List<ImageSurfaceProvider> mImageSurfaceProviders;
     private final Handler mImageReaderHandler;
     public ImageReaderManagerImpl() {
-        mImageReaders = new ArrayList<>();
+        mImageSurfaceProviders = new ArrayList<>();
         mImageReaderHandler = WorkerHandlerManager.getHandler(WorkerHandlerManager.Tag.T_TYPE_IMAGE_READER);
     }
 
     @Override
-    public ImageReader createImageReader(EsParams esParams, ImageReaderProvider provider) {
+    public Surface createImageSurface(EsParams esParams, ImageSurfaceProvider provider) {
         Size picSize = esParams.get(EsParams.Key.PIC_SIZE);
         Size previewSize = esParams.get(EsParams.Key.PREVIEW_SIZE);
-        ImageReader imageReader = provider.onCreateImageReader(previewSize, picSize, mImageReaderHandler);
-        mImageReaders.add(imageReader);
-        return imageReader;
+        mImageSurfaceProviders.add(provider);
+        return provider.onCreateImageSurface(previewSize, picSize, mImageReaderHandler);
     }
 
 
     @Override
     public void closeImageReaders() {
-        for (ImageReader imageReader : mImageReaders) {
-            imageReader.close();
+        for (ImageSurfaceProvider provider : mImageSurfaceProviders) {
+            provider.release();
         }
-        mImageReaders.clear();
+        mImageSurfaceProviders.clear();
     }
 }
