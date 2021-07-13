@@ -17,7 +17,7 @@ public class SurfaceManager {
 
     private static final SurfaceManager sSurfaceManager = new SurfaceManager();
 
-    private SurfaceProvider mSurfaceProvider;
+    private PreviewSurfaceProvider mPreviewSurfaceProvider;
     private final List<Surface> mCaptureSurface;
     private final List<Surface> mPreviewSurface;
 
@@ -30,23 +30,23 @@ public class SurfaceManager {
         return sSurfaceManager;
     }
 
-    public void setSurfaceProvider(SurfaceProvider surfaceProvider) {
+    public void setPreivewSurfaceProvider(PreviewSurfaceProvider previewSurfaceProvider) {
         release();
         EsLog.e(" set ===surface ===>");
-        this.mSurfaceProvider = surfaceProvider;
+        this.mPreviewSurfaceProvider = previewSurfaceProvider;
     }
 
     /**
      * 只获取预览surface list
      */
     public List<Surface> getPreviewSurface() {
-        EsLog.e("get preview " + mSurfaceProvider.getSurface());
-        mPreviewSurface.add(mSurfaceProvider.getSurface());
+        EsLog.e("get preview " + mPreviewSurfaceProvider.getSurface());
+        mPreviewSurface.add(mPreviewSurfaceProvider.getSurface());
         return mPreviewSurface;
     }
 
     public Class getPreviewSurfaceClass(){
-        return mSurfaceProvider.getPreviewSurfaceClass();
+        return mPreviewSurfaceProvider.getPreviewSurfaceClass();
     }
 
 
@@ -75,16 +75,16 @@ public class SurfaceManager {
     }
 
     public void setAspectRatio(Size size) {
-        mSurfaceProvider.setAspectRatio(size);
+        mPreviewSurfaceProvider.setAspectRatio(size);
     }
 
     public boolean isAvailable() {
-        return mSurfaceProvider.isAvailable();
+        return mPreviewSurfaceProvider.isAvailable();
     }
 
     public void release() {
         EsLog.d("release===>");
-        mSurfaceProvider = null;
+        mPreviewSurfaceProvider = null;
         mCaptureSurface.clear();
         mPreviewSurface.clear();
     }

@@ -39,11 +39,11 @@ public class VideoCaptureImpl implements VideoCapture {
     @Override
     public final void onStartPreview(@NonNull PreviewRequest request, final PreviewStateListener listener) {
         final EsParams esParams = new EsParams();
-        mSurfaceManager.setSurfaceProvider(request.getSurfaceProvider());
+        mSurfaceManager.setPreivewSurfaceProvider(request.getPreviewSurfaceProvider());
         esParams.put(EsParams.Key.SURFACE_MANAGER, mSurfaceManager);
         esParams.put(EsParams.Key.CAMERA_ID, request.getCameraId());
         esParams.put(EsParams.Key.FLASH_STATE, request.getFlashState());
-        esParams.put(EsParams.Key.IMAGE_READER_PROVIDERS, request.getImageReaderProviders());
+        esParams.put(EsParams.Key.IMAGE_READER_PROVIDERS, request.getSurfaceProviders());
 
         // 切换Camera 信息管理中的 Camera 信息， 如前置camera  或 后置Camera
         CameraInfo cameraInfo = CameraInfoHelper.getInstance().getCameraInfo(request.getCameraId());

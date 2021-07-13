@@ -33,19 +33,19 @@ class EsyCameraController {
         mCameraCapture = mCameraManager.videoModule();
     }
 
-    void backCamera(SurfaceProviderImpl helper, PreviewStateListener listener) {
+    void backCamera(PreviewSurfaceProviderImpl helper, PreviewStateListener listener) {
 
         PreviewRequest.Builder builder = getRequest();
         builder.openBackCamera()
-                .setSurfaceProvider(helper);
+                .setPreviewSurfaceProvider(helper);
 
         mCameraCapture.onStartPreview(builder.builder(),listener);
     }
 
-    void fontCamera(SurfaceProviderImpl helper, PreviewStateListener listener) {
+    void fontCamera(PreviewSurfaceProviderImpl helper, PreviewStateListener listener) {
         PreviewRequest.Builder builder = getRequest();
         builder.openFontCamera()
-                .setSurfaceProvider(helper);
+                .setPreviewSurfaceProvider(helper);
         mCameraCapture.onStartPreview(builder.builder(), listener);
     }
 
@@ -64,7 +64,7 @@ class EsyCameraController {
                 .setPictureSize(picSize, ImageFormat.JPEG)
                 .setFlash(FlashState.OFF)
 //                .addImageReaderProvider(new PreviewImageReader())
-                .addImageReaderProvider(new CaptureImageReader());
+                .addSurfaceProvider(new CaptureImageReader());
     }
 
     void torchFlash() {

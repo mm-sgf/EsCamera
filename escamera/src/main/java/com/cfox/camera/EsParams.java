@@ -6,7 +6,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.util.Pair;
 import android.util.Size;
 
-import com.cfox.camera.imagesurface.ImageReaderProvider;
+import com.cfox.camera.surface.SurfaceProvider;
 import com.cfox.camera.surface.SurfaceManager;
 
 import java.util.HashMap;
@@ -85,7 +85,7 @@ public class EsParams {
 
 
         public static final EsParams.Key<SurfaceManager> SURFACE_MANAGER = new EsParams.Key<>("surface_manager");
-        public static final EsParams.Key<List<ImageReaderProvider>> IMAGE_READER_PROVIDERS = new EsParams.Key<>("image_reader_providers");
+        public static final EsParams.Key<List<SurfaceProvider>> IMAGE_READER_PROVIDERS = new EsParams.Key<>("image_reader_providers");
         public static final EsParams.Key<String> CAMERA_ID = new EsParams.Key<>("camera_id");
         public static final EsParams.Key<CameraDevice> CAMERA_DEVICE = new EsParams.Key<>("camera_device");
         public static final EsParams.Key<String> OPEN_CAMERA_STATE = new EsParams.Key<>("open_camera_state");

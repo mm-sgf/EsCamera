@@ -1,4 +1,4 @@
-package com.cfox.camera.imagesurface;
+package com.cfox.camera.surface;
 
 import android.media.Image;
 import android.media.ImageReader;
@@ -9,7 +9,7 @@ import android.view.Surface;
 import java.nio.ByteBuffer;
 
 
-public abstract class ImageReaderProvider extends ImageSurfaceProvider implements ImageReader.OnImageAvailableListener {
+public abstract class ImageReaderProvider extends SurfaceProvider implements ImageReader.OnImageAvailableListener {
 
     private ImageReader mImageReader;
 
@@ -18,7 +18,7 @@ public abstract class ImageReaderProvider extends ImageSurfaceProvider implement
     }
 
     @Override
-    public Surface createImageSurface(Size previewSize, Size captureSize, Handler handler) {
+    public Surface createSurface(Size previewSize, Size captureSize, Handler handler) {
         mImageReader = createImageReader(previewSize, captureSize);
         mImageReader.setOnImageAvailableListener(this, handler);
         return mImageReader.getSurface();

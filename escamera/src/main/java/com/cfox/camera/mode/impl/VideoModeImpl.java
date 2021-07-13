@@ -2,9 +2,10 @@ package com.cfox.camera.mode.impl;
 
 
 import com.cfox.camera.EsException;
-import com.cfox.camera.imagesurface.ImageReaderManager;
-import com.cfox.camera.imagesurface.ImageSurfaceManagerImpl;
-import com.cfox.camera.imagesurface.ImageReaderProvider;
+import com.cfox.camera.surface.SurfaceProvider;
+import com.cfox.camera.surface.SurfaceProviderReaderManager;
+import com.cfox.camera.surface.SurfaceProviderSurfaceManagerImpl;
+import com.cfox.camera.surface.ImageReaderProvider;
 import com.cfox.camera.sessionmanager.VideoSessionManger;
 import com.cfox.camera.mode.VideoMode;
 import com.cfox.camera.mode.BaseMode;
@@ -18,30 +19,30 @@ import io.reactivex.Observable;
 
 public class VideoModeImpl extends BaseMode implements VideoMode {
     private final VideoSessionManger mVideoSessionManger;
-    private final ImageReaderManager mImageReaderManager;
+    private final SurfaceProviderReaderManager mSurfaceProviderReaderManager;
 
     public VideoModeImpl(VideoSessionManger videoSessionManger) {
         super(videoSessionManger);
         mVideoSessionManger = videoSessionManger;
-        mImageReaderManager = new ImageSurfaceManagerImpl();
+        mSurfaceProviderReaderManager = new SurfaceProviderSurfaceManagerImpl();
     }
 
     @Override
     public void onRequestStop() {
-        mImageReaderManager.closeImageReaders();
+        mSurfaceProviderReaderManager.release();
     }
 
     @Override
     protected Observable<EsParams> applySurface(final EsParams esParams) {
         return Observable.create(emitter -> {
             SurfaceManager manager = esParams.get(EsParams.Key.SURFACE_MANAGER);
-            List<ImageReaderProvider> imageReaderProviders = esParams.get(EsParams.Key.IMAGE_READER_PROVIDERS);
+            List<SurfaceProvider> surfaceProviders = esParams.get(EsParams.Key.IMAGE_READER_PROVIDERS);
             if (manager.isAvailable()) {
-                for (ImageReaderProvider provider : imageReaderProviders) {
+                for (SurfaceProvider provider : surfaceProviders) {
                     if (provider.getType() == ImageReaderProvider.TYPE.PREVIEW) {
-                        manager.addPreviewSurface(mImageReaderManager.createImageSurface(esParams, provider));
+                        manager.addPreviewSurface(mSurfaceProviderReaderManager.createSurface(esParams, provider));
                     } else if (provider.getType() == ImageReaderProvider.TYPE.CAPTURE) {
-                        manager.addCaptureSurface(mImageReaderManager.createImageSurface(esParams, provider));
+                        manager.addCaptureSurface(mSurfaceProviderReaderManager.createSurface(esParams, provider));
                     }
                 }
                 emitter.onNext(esParams);

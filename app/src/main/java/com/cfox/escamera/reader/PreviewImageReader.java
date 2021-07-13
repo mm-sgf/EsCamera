@@ -5,7 +5,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.util.Size;
 
-import com.cfox.camera.imagesurface.ImageReaderProvider;
+import com.cfox.camera.surface.ImageReaderProvider;
 import com.cfox.camera.log.EsLog;
 
 public class PreviewImageReader extends ImageReaderProvider {

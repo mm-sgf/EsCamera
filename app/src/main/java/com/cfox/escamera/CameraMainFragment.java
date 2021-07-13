@@ -28,7 +28,7 @@ import com.cfox.camera.utils.OrientationSensorManager;
 public class CameraMainFragment extends Fragment implements PreviewStateListener {
     private static final String TAG = "CameraMainFragment";
     private AutoFitTextureView mPreviewView;
-    private SurfaceProviderImpl mSurfaceHelperImpl;
+    private PreviewSurfaceProviderImpl mSurfaceHelperImpl;
     private EsyCameraController mCameraController;
     private FocusView mFocusView;
     private OrientationFilter mOrientationFilter;
@@ -109,24 +109,24 @@ public class CameraMainFragment extends Fragment implements PreviewStateListener
                 mCameraController.closeFlash());
 
         view.findViewById(R.id.btn_open_back).setOnClickListener(v -> {
-            mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
+            mSurfaceHelperImpl = new PreviewSurfaceProviderImpl(mPreviewView);
             mCameraController.backCamera(mSurfaceHelperImpl, CameraMainFragment.this);
         });
 
         view.findViewById(R.id.btn_open_font).setOnClickListener(v -> {
-            mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
+            mSurfaceHelperImpl = new PreviewSurfaceProviderImpl(mPreviewView);
             mCameraController.fontCamera(mSurfaceHelperImpl, CameraMainFragment.this);
         });
 
         view.findViewById(R.id.btn_photo).setOnClickListener(v -> {
             mCameraController.photoModule();
-            mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
+            mSurfaceHelperImpl = new PreviewSurfaceProviderImpl(mPreviewView);
             mCameraController.backCamera(mSurfaceHelperImpl, CameraMainFragment.this);
         });
 
         view.findViewById(R.id.btn_video).setOnClickListener(v -> {
             mCameraController.videoModule();
-            mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
+            mSurfaceHelperImpl = new PreviewSurfaceProviderImpl(mPreviewView);
             mCameraController.backCamera(mSurfaceHelperImpl, CameraMainFragment.this);
         });
 
@@ -183,7 +183,7 @@ public class CameraMainFragment extends Fragment implements PreviewStateListener
 
     private void openCamera() {
         mOrientationFilter.onResume();
-        mSurfaceHelperImpl = new SurfaceProviderImpl(mPreviewView);
+        mSurfaceHelperImpl = new PreviewSurfaceProviderImpl(mPreviewView);
         EsLog.d("openCamera: .......");
         mCameraController.backCamera(mSurfaceHelperImpl, this);
     }

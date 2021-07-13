@@ -6,15 +6,15 @@ import android.view.Surface;
 import android.view.TextureView;
 
 import com.cfox.camera.log.EsLog;
-import com.cfox.camera.surface.SurfaceProvider;
+import com.cfox.camera.surface.PreviewSurfaceProvider;
 
-public class SurfaceProviderImpl implements SurfaceProvider {
+public class PreviewSurfaceProviderImpl implements PreviewSurfaceProvider {
     private final Object obj = new Object();
     private AutoFitTextureView mTextureView;
     private Size mPreviewSize;
     private Surface mSurface;
 
-    public SurfaceProviderImpl(AutoFitTextureView textureView) {
+    public PreviewSurfaceProviderImpl(AutoFitTextureView textureView) {
         this.mTextureView = textureView;
         this.mTextureView.setSurfaceTextureListener(mTextureListener);
     }
